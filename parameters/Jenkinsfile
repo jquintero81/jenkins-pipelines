@@ -1,9 +1,12 @@
 pipeline {
     agent any
+    environment {
+        ENV_BRACH = "master"
+    }
     parameters {
         choice(name: 'ENVIRONMENT', choices: ['dev', 'pre', 'pro'])
         string(name: 'PLAYBOOK', defaultValue: 'my-example-playbook', trim: true)
-        string(name: 'BRANCH', defaultValue: 'master', trim: true)
+        string(name: 'BRANCH_PARAM', defaultValue: 'master', trim: true)
     } //params
     stages {
         stage('Config') {
@@ -11,6 +14,8 @@ pipeline {
                 script {
                     step1(getRole("${ENVIRONMENT}"), 'jquintero-${ENVIRONMENT}-devops')
                     step2("${ENVIRONMENT}")
+                    env.ENV_BRACH = "${BRANCH_PARAM}"
+                    echo "ENV_BRACH = ${ENV_BRACH}"
                 } //script
             } //steps
          } //stage
