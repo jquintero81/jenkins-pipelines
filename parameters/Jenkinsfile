@@ -1,0 +1,60 @@
+pipeline {
+    agent any
+    parameters {
+        choice(name: 'ENVIRONMENT', choices: ['dev', 'pre', 'pro'])
+        string(name: 'PLAYBOOK', defaultValue: 'my-example-playbook', trim: true)
+        string(name: 'BRANCH', defaultValue: 'master', trim: true)
+    } //params
+    stages {
+        stage('Config') {
+            steps {
+                script {
+                    step1(getRole("${ENVIRONMENT}"), 'jquintero-${ENVIRONMENT}-devops')
+                    step2("${ENVIRONMENT}")
+                } //script
+            } //steps
+         } //stage
+        stage('Apply') {
+            steps {
+                script {
+                    applyExample("${ENVIRONMENT}", "${PLAYBOOK}")
+                } //script
+            } //steps
+        } //stage
+    }//stages
+}//pipeline
+
+//functions
+def step1(String ROLE, String SESSION) {
+    echo 'step1'
+}
+
+def step2(String ENVIRONMENT) {
+    echo 'step2'
+    echo "${ENVIRONMENT}-jquintero-pem"
+    echo "${ENVIRONMENT}-jquintero-vault"
+}
+
+def getRole(String ENVIRONMENT) {
+    String jquinteroRole = null
+    switch (ENVIRONMENT) {
+        case 'dev':
+            jquinteroRole = 'arn:aws:iam::12345678910:role/dev-jquintero-devops'
+            break
+        case 'pre':
+            jquinteroRole = 'arn:aws:iam::12345678910:role/dev-jquintero-devops'
+            break
+        case 'pro':
+            jquinteroRole = 'arn:aws:iam::12345678910:role/pro-jquintero-devops'
+            break
+    } //case
+    return jquinteroRole
+}
+
+
+def applyExample(String ENVIRONMENT, String PLAYBOOK) {
+    echo "${ENVIRONMENT}"
+    echo "${PLAYBOOK}"
+    playbookFile = "${PLAYBOOK}.yml"
+    echo "${playbookFile}"
+}
